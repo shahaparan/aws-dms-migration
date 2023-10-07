@@ -19,36 +19,43 @@ This repository contains instructions and configuration steps for migrating data
 
 ### Create DMS Roles
 
-1. Navigate to the **IAM dashboard** -> Click on **Roles** -> Click the **Create role** button.
-   
-2. Choose **AWS service** as the type of trusted entity.
+2. Navigate to the IAM (Identity and Access Management) dashboard -> Click on **Roles** -> Click the **Create role** button.
 
-3. For the use case, select **DMS" (Database Migration Service)**.
+5. Choose **AWS service** as the type of trusted entity.
 
-3. Attach the following policies to the role:
+6. For the use case, select **DMS" (Database Migration Service)**.
+
+8. Attach the following policies to the role:
    - AmazonS3FullAccess: Grants full access to Amazon S3.
    - AmazonRDSFullAccess: Grants full access to Amazon RDS.
   
-4. Provide a name for the role (e.g., **MySqltos3**) and a description.
+9. Provide a name for the role (e.g., **MySqltos3**) and a description.
 
-5. Click **Create role** and copy the ARN for later use.
+10. Click "Create role" and copy the ARN for later use.
 
 ### Create S3 Bucket
-1. Navigate to the **S3 dashboard** -> Click **Create bucket.**
-2. Enter the following details:
-   - Bucket name: **mydmstos3**
-   - Region: **us-east-1** (or your preferred region).
-3. Keep **all default settings** and **create the bucket**.
+
+1. Log in to your AWS Management Console.
+
+2. Navigate to the S3 dashboard.
+
+3. Click "Create bucket."
+
+4. Enter the following details:
+   - Bucket name: `mydmstos3`
+   - Region: `us-east-1` (or your preferred region).
+
+5. Keep all default settings and create the bucket.
 
 ## EC2 Instance Creation
 
-1. Navigate to the EC2 dashboard-> Click **Launch Instance**.-> Choose the **Amazon Linux 2 AMI** in the Default VPC.
+2. Navigate to the EC2 dashboard-> Click "Launch Instance.-> Choose the "Amazon Linux 2 AMI" in the Default VPC.
 
-2. Add tags with key: **Name** and value: **mysql-client**
+5. Add tags with key: `Name` and value: `mysql-client`.
 
-3. Configure the security group named **SG-mysql** to open ports 22 (SSH) and 3306 (MySQL/Aurora).
+6. Configure the security group named `SG-mysql` to open ports 22 (SSH) and 3306 (MySQL/Aurora).
 
-4. Launch the instance and connect with SSH.
+7. Launch the instance and connect with SSH.
 
 ## Connecting with Terminal
 
@@ -72,10 +79,15 @@ we will create an RDS (Relational Database Service) MySQL database for use in ou
 
 ### Step 1: Create an RDS MySQL Database
 
-1. Navigate to the RDS dashboard -> Click on **Databases** -> Click the **Create database** button.
+1. Navigate to the RDS dashboard.
 
-2. Choose the **Easy create** method for database creation.
-3. Configure the following settings:
+2. Click on "Databases" in the left navigation pane.
+
+3. Click the "Create database" button.
+
+4. Choose the "Easy create" method for database creation.
+
+5. Configure the following settings:
 
    - **Engine type**: MySQL
    - **DB instance size**: Free tier (or choose an appropriate size for your needs)
@@ -83,7 +95,7 @@ we will create an RDS (Relational Database Service) MySQL database for use in ou
    - **Master username**: `admin`
    - **Master password**: `admin1234!` (Choose a strong and secure password.)
 
-6. Click the **Create database** button to initiate the database creation process. Wait for the database to become available.
+6. Click the "Create database" button to initiate the database creation process. Wait for the database to become available.
 
 ### Step 2: Modify RDS Security Group
 
