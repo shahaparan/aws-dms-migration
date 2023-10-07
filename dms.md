@@ -115,44 +115,159 @@ mysql -h endpointurl -P 3306 -u admin -p
 # You'll be prompted to enter the password for the admin user (e.g., admin1234!).
 
 Creating a New Database
-You can create a new database called LIBRARY with the following commands:
+You can create a new database called merch_store with the following commands:
 
-  CREATE DATABASE LIBRARY;
+CREATE DATABASE merch_store;
 
 #After creating the database, you can switch to it using:
-USE LIBRARY;
+USE merch_store;
 
-#Creating a Table - Let's create a table named books with the following structure:
+#Creating a Table - Let's create a table named merch_store with the following structure:
 
-CREATE TABLE IF NOT EXISTS books (
-	book_id INT,
-	title VARCHAR(255) NOT NULL,
-	publish_date DATE,
-	description TEXT,
-	PRIMARY KEY (book_id)
-) ENGINE=INNODB;
+-- Create the Categories table
+CREATE TABLE Categories (
+    CategoryID INT AUTO_INCREMENT PRIMARY KEY,
+    CategoryName VARCHAR(255) NOT NULL
+);
 
-# This table will store information about books, including an ID, title, publish date, and description.
+-- Create the Products table
+CREATE TABLE Products (
+    ProductID INT AUTO_INCREMENT PRIMARY KEY,
+    ProductName VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Price DECIMAL(10, 2) NOT NULL,
+    CategoryID INT,
+    StockQuantity INT NOT NULL,
+    ImageURL VARCHAR(255),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
+);
 
-## Viewing Tables and Data
+-- Create the Customers table
+CREATE TABLE Customers (
+    CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) NOT NULL,
+    Password VARCHAR(255) NOT NULL, -- Store hashed passwords securely
+    Address TEXT,
+    PhoneNumber VARCHAR(20),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
-You can list all the tables in the current database with:
-SHOW TABLES;
+-- Create the Orders table
+CREATE TABLE Orders (
+    OrderID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
+    OrderStatus VARCHAR(50),
+    ShippingAddress TEXT,
+    PaymentStatus VARCHAR(50),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
 
-To check the structure of the books table, you can use:
-DESCRIBE books;
+-- Create the OrderItems table
+CREATE TABLE OrderItems (
+    OrderItemID INT AUTO_INCREMENT PRIMARY KEY,
+    OrderID INT,
+    ProductID INT,
+    Quantity INT NOT NULL,
+    PricePerUnit DECIMAL(10, 2) NOT NULL,
+    Subtotal DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
 
-Finally, let's insert some dummy data into the books table:
-INSERT INTO books (book_id, title, publish_date, description)
+-- Create the Reviews table
+CREATE TABLE Reviews (
+    ReviewID INT AUTO_INCREMENT PRIMARY KEY,
+    ProductID INT,
+    CustomerID INT,
+    Rating INT NOT NULL,
+    Comment TEXT,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+-- Create the Cart table
+CREATE TABLE Cart (
+    CartID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT,
+    ProductID INT,
+    Quantity INT NOT NULL,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- Create the Payments table
+CREATE TABLE Payments (
+    PaymentID INT AUTO_INCREMENT PRIMARY KEY,
+    OrderID INT,
+    PaymentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PaymentAmount DECIMAL(10, 2) NOT NULL,
+    PaymentMethod VARCHAR(50),
+    PaymentStatus VARCHAR(50),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+);
+
+-- Insert data into Products
+INSERT INTO Products (ProductName, Description, Price, CategoryID, StockQuantity, ImageURL)
 VALUES
-    (1, 'Learn MySQL', CURDATE(), 'This is a book on MySQL.'),
-    (2, 'Learn Oracle', CURDATE(), 'This is a book on Oracle.'),
-    (3, 'Learn SQL Server', CURDATE(), 'This is a book on SQL Server.'),
-    (4, 'Learn DB2', CURDATE(), 'This is a book on DB2.'),
-    (5, 'Learn Aurora', CURDATE(), 'This is a book on Amazon Aurora.');
+    ('Smartphone', 'High-quality smartphone', 499.99, 1, 100, 'phone.jpg'),
+    ('Laptop', 'Powerful laptop', 899.99, 1, 50, 'laptop.jpg'),
+    ('T-shirt', 'Cotton t-shirt', 19.99, 2, 200, 'tshirt.jpg'),
+    ('Jeans', 'Blue jeans', 39.99, 2, 150, 'jeans.jpg'),
+    ('Python Programming', 'Python programming book', 29.99, 3, 50, 'python_book.jpg'),
+    ('Cookware Set', '10-piece cookware set', 149.99, 4, 30, 'cookware.jpg');
+
+-- Insert data into Customers
+INSERT INTO Customers (FirstName, LastName, Email, Password, Address, PhoneNumber)
+VALUES
+    ('John', 'Doe', 'john@example.com', 'hashed_password', '123 Main St, City', '555-123-4567'),
+    ('Jane', 'Smith', 'jane@example.com', 'hashed_password', '456 Elm St, Town', '555-987-6543');
+
+-- Insert data into Orders
+INSERT INTO Orders (CustomerID, TotalAmount, OrderStatus, ShippingAddress, PaymentStatus)
+VALUES
+    (1, 799.98, 'Processing', '123 Main St, City', 'Paid'),
+    (2, 99.98, 'Shipped', '456 Elm St, Town', 'Paid');
+
+-- Insert data into OrderItems
+INSERT INTO OrderItems (OrderID, ProductID, Quantity, PricePerUnit, Subtotal)
+VALUES
+    (1, 1, 1, 499.99, 499.99),
+    (1, 3, 2, 19.99, 39.98),
+    (2, 4, 1, 39.99, 39.99);
+
+-- Insert data into Reviews
+INSERT INTO Reviews (ProductID, CustomerID, Rating, Comment)
+VALUES
+    (1, 1, 5, 'Great smartphone!'),
+    (3, 2, 4, 'Comfortable t-shirt.');
+
+-- Insert data into Cart
+INSERT INTO Cart (CustomerID, ProductID, Quantity)
+VALUES
+    (1, 2, 1),
+    (2, 5, 2);
+
+-- Insert data into Payments
+INSERT INTO Payments (OrderID, PaymentAmount, PaymentMethod, PaymentStatus)
+VALUES
+    (1, 799.98, 'Credit Card', 'Paid'),
+    (2, 99.98, 'PayPal', 'Paid');
 
 -- View the data in the books table
-SELECT * FROM books;
+SELECT * FROM Products;
+SELECT * FROM Customers;
+SELECT * FROM Orders;
+
 ```
 
 
