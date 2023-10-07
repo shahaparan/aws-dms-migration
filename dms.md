@@ -28,10 +28,10 @@ This repository contains instructions and configuration steps for migrating data
 3. Attach the following policies to the role:
    - AmazonS3FullAccess: Grants full access to Amazon S3.
    - AmazonRDSFullAccess: Grants full access to Amazon RDS.
-  
-4. Provide a name for the role (e.g., **MySqltos3**) and a description.
 
-5. Click **Create role** and copy the ARN for later use.
+5. Provide a name for the role **MySqltos3** and a description.
+
+6. Click **Create role** and copy the ARN for later use.
 
 ### Create S3 Bucket
 1. Navigate to the **S3 dashboard** -> Click **Create bucket.**
@@ -48,7 +48,7 @@ This repository contains instructions and configuration steps for migrating data
 
 3. Configure the security group named **SG-mysql** to open ports 22 (SSH) and 3306 (MySQL/Aurora).
 
-4. Launch the instance and connect with SSH.
+4.  **Launch the instance and connect with SSH**
 
 ## Connecting with Terminal
 
@@ -67,16 +67,13 @@ This repository contains instructions and configuration steps for migrating data
    mysql --version
 
 ## RDS MySQL Database Creation
-
 we will create an RDS (Relational Database Service) MySQL database for use in our migration.
-
-### Step 1: Create an RDS MySQL Database
 
 1. Navigate to the RDS dashboard -> Click on **Databases** -> Click the **Create database** button.
 
 2. Choose the **Easy create** method for database creation.
-3. Configure the following settings:
-
+   
+4. Configure the following settings:
    - **Engine type**: MySQL
    - **DB instance size**: Free tier (or choose an appropriate size for your needs)
    - **DB instance identifier**: `db-mysql-s3`
@@ -86,28 +83,23 @@ we will create an RDS (Relational Database Service) MySQL database for use in ou
 6. Click the **Create database** button to initiate the database creation process. Wait for the database to become available.
 
 ### Step 2: Modify RDS Security Group
+1. In the RDS dashboard, select the database you just created **db-mysql-s3** -> Navigate to the **Connectivity & security** tab.
 
-1. In the RDS dashboard, select the database you just created (`db-mysql-s3`).
+3. In the **Security** section, click on **VPC security groups.**
 
-2. Navigate to the "Connectivity & security" tab.
+4. You will see the **default** security group. Click on **default** to open it.
 
-3. In the "Security" section, click on "VPC security groups."
-
-4. You will see the "default" security group. Click on "default" to open it.
-
-5. In the "Inbound rules" tab, click "Edit inbound rules."
+5. In the **Inbound rules** tab, click **Edit inbound rules.**
 
 6. Add a new inbound rule with the following settings:
-
    - **Type**: MySQL/Aurora
    - **Protocol**: TCP
    - **Port range**: 3306
-   - **Source**: Select the security group used by your EC2 instance (e.g., `sg-client`).
+   - **Source**: Select the security group used by your EC2 instance **sg-client**.
 
-7. Click "Save rules" to apply the changes.
+7. Click **Save rules** to apply the changes.
 
-Now, your RDS MySQL database is accessible from the EC2 instance you created earlier using the security group (`sg-client`). You can connect to this database from your EC2 instance and perform data migration tasks.
-
+Now, your RDS MySQL database is accessible from the EC2 instance you created earlier using the security group **sg-client**. You can connect to this database from your EC2 instance and perform data migration tasks.
 
 ## RDS MySQL - Add Dummy Data
 
